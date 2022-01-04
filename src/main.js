@@ -77,9 +77,6 @@ function draw() {
 	const delta = (Date.now() - lastFrame) / 1000;
 
 	for (let i = emoteArray.length - 1; i >= 0; i--) {
-		emoteArray[i].position.x += emoteArray[i].velocity.x * delta;
-		emoteArray[i].position.y += emoteArray[i].velocity.y * delta;
-		emoteArray[i].position.z += emoteArray[i].velocity.z * delta;
 
 		emoteArray[i].rotation.x += emoteArray[i].rotationVelocity.x * delta;
 		emoteArray[i].rotation.y += emoteArray[i].rotationVelocity.y * delta;
@@ -97,6 +94,9 @@ function draw() {
 		if (p >= 1) {
 			scene.remove(emoteArray[i]);
 			emoteArray.splice(i, 1);
+		} else {
+			emoteArray[i].position.x = Math.sin(p * Math.PI - Math.PI * 0.75) * emoteArray[i].distance * ((1 - p) * 0.5 + 0.5) + videoMesh.position.x;
+			emoteArray[i].position.y = Math.cos(p * Math.PI - Math.PI * 0.75) * emoteArray[i].distance * ((1 - p) * 0.5 + 0.5) + videoMesh.position.y;
 		}
 	}
 
@@ -121,35 +121,20 @@ function random3DDirection(noiseScalar = 0.001) {
 }
 
 // add a callback function for when a new message with emotes is sent
-const emoteSpawnDistance = 4;
 const emoteArray = [];
 const emoteGeometry = new THREE.PlaneBufferGeometry(1, 1, 1, 1);
 const squishVector = new THREE.Vector3(1, 1, 4);
 
-const spawnDistance = 10;
-const spawns = [
-	{
-		position: new THREE.Vector3(-spawnDistance, 0, 0),
-		velocity: new THREE.Vector3(0.9, 0.7, 0),
-	},
-	{
-		position: new THREE.Vector3(spawnDistance*0.25, spawnDistance*0.5, 0),
-		velocity: new THREE.Vector3(-0.9, -0.7, 0),
-	},
-]
 ChatInstance.listen((emotes) => {
 	const group = new THREE.Group();
 
 	group.rotationVelocity = random3DDirection(0.0004).multiplyScalar(Math.random());
-	
-	const spawn = spawns[Math.floor(Math.random() * spawns.length)];
-	group.position.copy(spawn.position);
-	group.position.add(random3DDirection(0.0006).multiply(squishVector));
-	group.velocity = new THREE.Vector3().copy(spawn.velocity).multiplyScalar(Math.random() * 0.5 + 0.5).add(random3DDirection(0.0006).multiplyScalar(0.2));
 
+	group.position.add(random3DDirection(0.0006).multiply(squishVector));
 
 	group.dateSpawned = Date.now();
 	group.lifespan = 12000 + Math.random() * 10000;
+	group.distance = 8 + Math.random();
 
 	const innerGroup = new THREE.Group();
 	group.add(innerGroup);
@@ -186,6 +171,6 @@ const videoMaterial = new THREE.MeshBasicMaterial({
 });
 const videoGeometry = new THREE.PlaneBufferGeometry(1, 0.75, 1, 1);
 const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
-videoMesh.scale.setScalar(8);
+videoMesh.scale.setScalar(9);
 videoMesh.position.set(3.5, -1, 0);
 scene.add(videoMesh);
