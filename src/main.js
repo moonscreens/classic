@@ -145,7 +145,7 @@ ChatInstance.listen((emotes) => {
 	const spawn = spawns[Math.floor(Math.random() * spawns.length)];
 	group.position.copy(spawn.position);
 	group.position.add(random3DDirection(0.0006).multiply(squishVector));
-	group.velocity = new THREE.Vector3().copy(spawn.velocity).multiplyScalar(Math.random() * 0.5 + 0.5).add(random3DDirection(0.0006).multiply(squishVector).multiplyScalar(0.2));
+	group.velocity = new THREE.Vector3().copy(spawn.velocity).multiplyScalar(Math.random() * 0.5 + 0.5).add(random3DDirection(0.0006).multiplyScalar(0.2));
 
 
 	group.dateSpawned = Date.now();
