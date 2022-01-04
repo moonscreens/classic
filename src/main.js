@@ -2,6 +2,8 @@ import SimplexNoise from "simplex-noise";
 import * as THREE from "three";
 import TwitchChat from "twitch-chat-emotes-threejs";
 import Stats from "stats.js";
+import { Vector2 } from "three";
+import { Vector3 } from "three";
 
 const simplex = new SimplexNoise();
 
@@ -65,7 +67,7 @@ function resize() {
 resize();
 window.addEventListener('resize', resize);
 
-const center = new THREE.Vector3(0, 0, 0);
+const lookTarget = new THREE.Vector3();
 
 let lastFrame = Date.now();
 // Called once per frame
@@ -77,26 +79,21 @@ function draw() {
 	const delta = (Date.now() - lastFrame) / 1000;
 
 	for (let i = emoteArray.length - 1; i >= 0; i--) {
-
-		emoteArray[i].rotation.x += emoteArray[i].rotationVelocity.x * delta;
-		emoteArray[i].rotation.y += emoteArray[i].rotationVelocity.y * delta;
-		emoteArray[i].rotation.z += emoteArray[i].rotationVelocity.z * delta;
-
 		const p = (Date.now() - emoteArray[i].dateSpawned) / emoteArray[i].lifespan;
-		if (p < 0.25) {
-			emoteArray[i].scale.setScalar(Math.pow(easeInOutSine(p * 4), 4));
-		} else if (p < 0.75) {
-			emoteArray[i].scale.setScalar(1);
-		} else {
-			emoteArray[i].scale.setScalar(Math.pow(easeInOutSine(1 - ((p - 0.75) * 4)), 4));
-		}
 
 		if (p >= 1) {
 			scene.remove(emoteArray[i]);
 			emoteArray.splice(i, 1);
 		} else {
-			emoteArray[i].position.x = Math.sin(p * Math.PI - Math.PI * 0.75) * emoteArray[i].distance * ((1 - p) * 0.5 + 0.5) + videoMesh.position.x;
-			emoteArray[i].position.y = Math.cos(p * Math.PI - Math.PI * 0.75) * emoteArray[i].distance * ((1 - p) * 0.5 + 0.5) + videoMesh.position.y;
+			const piStuff = (p * Math.PI * 1.1 - Math.PI * 0.75);
+			const distMult = ((1 - p) * 0.5 + 0.5);
+			emoteArray[i].position.x = Math.sin(piStuff) * emoteArray[i].distance * distMult + videoMesh.position.x;
+			emoteArray[i].position.y = Math.cos(piStuff) * emoteArray[i].distance * distMult + videoMesh.position.y;
+			if (p > 0.9) {
+				emoteArray[i].position.x += easeInOutSine((p - 0.9) * 10) * 4;
+			}
+			emoteArray[i].children[0].lookAt(lookTarget)
+
 		}
 	}
 
@@ -128,13 +125,12 @@ const squishVector = new THREE.Vector3(1, 1, 4);
 ChatInstance.listen((emotes) => {
 	const group = new THREE.Group();
 
-	group.rotationVelocity = random3DDirection(0.0004).multiplyScalar(Math.random());
 
 	group.position.add(random3DDirection(0.0006).multiply(squishVector));
 
 	group.dateSpawned = Date.now();
-	group.lifespan = 12000 + Math.random() * 10000;
-	group.distance = 8 + Math.random();
+	group.lifespan = 15000 + Math.random() * 10000;
+	group.distance = 8 + Math.random() * 3;
 
 	const innerGroup = new THREE.Group();
 	group.add(innerGroup);
@@ -173,4 +169,6 @@ const videoGeometry = new THREE.PlaneBufferGeometry(1, 0.75, 1, 1);
 const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 videoMesh.scale.setScalar(9);
 videoMesh.position.set(3.5, -1, 0);
+lookTarget.copy(videoMesh.position);
+lookTarget.z += 3;
 scene.add(videoMesh);
