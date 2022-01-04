@@ -133,7 +133,7 @@ const spawns = [
 		velocity: new THREE.Vector3(0.9, 0.7, 0),
 	},
 	{
-		position: new THREE.Vector3(spawnDistance, 0, 0),
+		position: new THREE.Vector3(spawnDistance*0.25, spawnDistance*0.5, 0),
 		velocity: new THREE.Vector3(-0.9, -0.7, 0),
 	},
 ]
@@ -145,11 +145,11 @@ ChatInstance.listen((emotes) => {
 	const spawn = spawns[Math.floor(Math.random() * spawns.length)];
 	group.position.copy(spawn.position);
 	group.position.add(random3DDirection(0.0006).multiply(squishVector));
-	group.velocity = new THREE.Vector3().copy(spawn.velocity).multiplyScalar(Math.random() * 0.5 + 0.5);
+	group.velocity = new THREE.Vector3().copy(spawn.velocity).multiplyScalar(Math.random() * 0.5 + 0.5).add(random3DDirection(0.0006).multiply(squishVector).multiplyScalar(0.2));
 
 
 	group.dateSpawned = Date.now();
-	group.lifespan = 7000 + Math.random() * 10000;
+	group.lifespan = 12000 + Math.random() * 10000;
 
 	const innerGroup = new THREE.Group();
 	group.add(innerGroup);
@@ -187,5 +187,5 @@ const videoMaterial = new THREE.MeshBasicMaterial({
 const videoGeometry = new THREE.PlaneBufferGeometry(1, 0.75, 1, 1);
 const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 videoMesh.scale.setScalar(8);
-videoMesh.position.set(0, 0, 0);
+videoMesh.position.set(3.5, -1, 0);
 scene.add(videoMesh);
