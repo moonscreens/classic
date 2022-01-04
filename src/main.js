@@ -49,7 +49,7 @@ camera.position.z = 10;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x111111);
-scene.fog = new THREE.Fog(0x111111, 10, 20);
+scene.fog = new THREE.Fog(0x111111, 10.01, 20);
 
 const renderer = new THREE.WebGLRenderer({
     antialias: false,
