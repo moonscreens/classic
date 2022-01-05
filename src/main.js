@@ -2,8 +2,6 @@ import SimplexNoise from "simplex-noise";
 import * as THREE from "three";
 import TwitchChat from "twitch-chat-emotes-threejs";
 import Stats from "stats.js";
-import { Vector2 } from "three";
-import { Vector3 } from "three";
 
 const simplex = new SimplexNoise();
 
@@ -51,7 +49,7 @@ camera.position.z = 10;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x111111);
-scene.fog = new THREE.Fog(0x111111, 10.01, 20);
+scene.fog = new THREE.Fog(0x111111, 10.01, 15);
 
 const renderer = new THREE.WebGLRenderer({
 	antialias: true,
@@ -85,12 +83,12 @@ function draw() {
 			scene.remove(emoteArray[i]);
 			emoteArray.splice(i, 1);
 		} else {
-			const piStuff = (p * Math.PI * 1.1 - Math.PI * 0.75);
-			const distMult = ((1 - p) * 0.5 + 0.5);
+			const piStuff = (p * Math.PI * 1.5 - Math.PI * 0.75);
+			const distMult = ((1 - p) * 0.25 + 0.75);
 			emoteArray[i].position.x = Math.sin(piStuff) * emoteArray[i].distance * distMult + videoMesh.position.x;
 			emoteArray[i].position.y = Math.cos(piStuff) * emoteArray[i].distance * distMult + videoMesh.position.y;
 			if (p > 0.9) {
-				emoteArray[i].position.x += easeInOutSine((p - 0.9) * 10) * 4;
+				emoteArray[i].position.y -= easeInSine((p - 0.9) * 10) * 4;
 			}
 			emoteArray[i].children[0].lookAt(lookTarget)
 
@@ -105,6 +103,9 @@ function draw() {
 
 function easeInOutSine(t) {
 	return -0.5 * (Math.cos(Math.PI * t) - 1);
+}
+function easeInSine(t) {
+	return -Math.cos(t * Math.PI * 0.5) + 1;
 }
 
 
@@ -129,8 +130,8 @@ ChatInstance.listen((emotes) => {
 	group.position.add(random3DDirection(0.0006).multiply(squishVector));
 
 	group.dateSpawned = Date.now();
-	group.lifespan = 15000 + Math.random() * 10000;
-	group.distance = 8 + Math.random() * 3;
+	group.lifespan = 12000 + Math.random() * 25000;
+	group.distance = 6 + Math.random() * 3;
 
 	const innerGroup = new THREE.Group();
 	group.add(innerGroup);
@@ -167,8 +168,8 @@ const videoMaterial = new THREE.MeshBasicMaterial({
 });
 const videoGeometry = new THREE.PlaneBufferGeometry(1, 0.75, 1, 1);
 const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
-videoMesh.scale.setScalar(9);
-videoMesh.position.set(3.5, -1, 0);
+videoMesh.scale.setScalar(10);
+videoMesh.position.set(3, -0.8, 0);
 lookTarget.copy(videoMesh.position);
 lookTarget.z += 3;
 scene.add(videoMesh);
