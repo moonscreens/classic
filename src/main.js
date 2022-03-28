@@ -73,9 +73,6 @@ function draw() {
 	if (stats) stats.begin();
 	window.requestAnimationFrame(draw);
 
-	// number of seconds since the last frame was drawn
-	const delta = (Date.now() - lastFrame) / 1000;
-
 	for (let i = emoteArray.length - 1; i >= 0; i--) {
 		const p = (Date.now() - emoteArray[i].dateSpawned) / emoteArray[i].lifespan;
 
@@ -84,11 +81,14 @@ function draw() {
 			emoteArray.splice(i, 1);
 		} else {
 			const piStuff = (p * Math.PI * 1.5 - Math.PI * 0.75);
-			const distMult = ((1 - p) * 0.25 + 0.75);
-			emoteArray[i].position.x = Math.sin(piStuff) * emoteArray[i].distance * distMult + videoMesh.position.x;
-			emoteArray[i].position.y = Math.cos(piStuff) * emoteArray[i].distance * distMult + videoMesh.position.y;
+			emoteArray[i].position.x = Math.sin(piStuff) * emoteArray[i].distance + videoMesh.position.x;
+			emoteArray[i].position.y = Math.cos(piStuff) * emoteArray[i].distance + videoMesh.position.y;
 			if (p > 0.9) {
-				emoteArray[i].position.y -= easeInSine((p - 0.9) * 10) * 4;
+				emoteArray[i].scale.setScalar(easeInSine(1 - (p - 0.9) * 10));
+			}else if (p < 0.1) {
+				emoteArray[i].scale.setScalar(easeInSine(p * 10));
+			} else if (emoteArray[i].scale.x !== 1) {
+				emoteArray[i].scale.setScalar(1);
 			}
 			emoteArray[i].children[0].lookAt(lookTarget)
 
@@ -131,7 +131,7 @@ ChatInstance.listen((emotes) => {
 
 	group.dateSpawned = Date.now();
 	group.lifespan = 12000 + Math.random() * 25000;
-	group.distance = 6 + Math.random() * 3;
+	group.distance = 4 + Math.random() * 5;
 
 	const innerGroup = new THREE.Group();
 	group.add(innerGroup);
