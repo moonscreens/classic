@@ -30,6 +30,8 @@ if (query_vars.stats) {
 }
 
 const ChatInstance = new TwitchChat({
+	THREE,
+
 	// If using planes, consider using MeshBasicMaterial instead of SpriteMaterial
 	materialType: THREE.MeshBasicMaterial,
 
@@ -85,7 +87,7 @@ function draw() {
 			emoteArray[i].position.y = Math.cos(piStuff) * emoteArray[i].distance + videoMesh.position.y;
 			if (p > 0.9) {
 				emoteArray[i].scale.setScalar(easeInSine(1 - (p - 0.9) * 10));
-			}else if (p < 0.1) {
+			} else if (p < 0.1) {
 				emoteArray[i].scale.setScalar(easeInSine(p * 10));
 			} else if (emoteArray[i].scale.x !== 1) {
 				emoteArray[i].scale.setScalar(1);
